@@ -2,23 +2,43 @@ import { SpokenPiece } from "../../domain/interpretation.js";
 import { AudioChunk, SpeechRecognizer } from "../../ports/speech-recognizer.js";
 import { parseSonioxMessage } from "./message-parsing.js";
 
-export class SonioxConfiguration {
+export class SonioxCredential {
   private constructor(private readonly apiKey: string) {}
 
-  static withKey(apiKey: string): SonioxConfiguration {
-    return new SonioxConfiguration(apiKey);
+  static of(apiKey: string): SonioxCredential {
+    return new SonioxCredential(apiKey);
+  }
+
+  reveal(): string {
+    return this.apiKey;
+  }
+}
+
+export class SonioxConfiguration {
+  // 화자 구분은 대면(솔로)에서만 켠다 — 조립 주체(composition root)가 결정
+  private constructor(
+    private readonly credential: SonioxCredential,
+    private readonly diarization: boolean,
+  ) {}
+
+  static forSolo(credential: SonioxCredential): SonioxConfiguration {
+    return new SonioxConfiguration(credential, true);
+  }
+
+  static forRoom(credential: SonioxCredential): SonioxConfiguration {
+    return new SonioxConfiguration(credential, false);
   }
 
   handshake(): string {
     return JSON.stringify({
-      api_key: this.apiKey,
+      api_key: this.credential.reveal(),
       model: "stt-rt-v4",
       audio_format: "s16le",
       sample_rate: 16000,
       num_channels: 1,
       language_hints: ["ko", "ja"],
       enable_endpoint_detection: true,
-      enable_speaker_diarization: true,
+      enable_speaker_diarization: this.diarization,
     });
   }
 }
