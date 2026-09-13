@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { parseSonioxMessage } from "../../src/adapters/soniox/message-parsing.js";
 
 describe("Soniox 메시지 파싱", () => {
-  it("original 토큰 → SpokenPiece (화자 라벨 포함)", () => {
+  it("original 토큰 → SpokenPiece (문자열 화자 → 정수 정규화)", () => {
     const pieces = parseSonioxMessage(
       JSON.stringify({
         tokens: [
-          { text: "안녕", language: "ko", speaker: 1, translation_status: "original" },
+          { text: "안녕", language: "ko", speaker: "1", translation_status: "original" },
         ],
       }),
     );

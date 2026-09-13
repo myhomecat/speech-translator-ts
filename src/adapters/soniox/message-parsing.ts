@@ -6,7 +6,8 @@ import { SpokenPiece } from "../../domain/interpretation.js";
 interface SonioxToken {
   text?: string;
   language?: string;
-  speaker?: number;
+  // Soniox 는 화자를 «문자열»("1")로 준다 — Speaker 로 감쌀 때 정수 변환
+  speaker?: string;
   translation_status?: string;
 }
 
@@ -33,7 +34,7 @@ function toSpokenPiece(token: SonioxToken): SpokenPiece {
   return {
     text: TranscriptText.of(token.text ?? ""),
     language: Language.fromCode(token.language ?? "ko"),
-    speaker: token.speaker === undefined ? undefined : Speaker.numbered(token.speaker),
+    speaker: token.speaker === undefined ? undefined : Speaker.fromLabel(token.speaker),
     endsUtterance: false,
   };
 }
