@@ -1,6 +1,6 @@
 import { SpokenPiece } from "../../domain/interpretation.js";
 import { AudioChunk, SpeechRecognizer } from "../../ports/speech-recognizer.js";
-import { parseSonioxMessage } from "./message-parsing.js";
+import { SonioxTranscriptReader } from "./message-parsing.js";
 
 export class SonioxCredential {
   private constructor(private readonly apiKey: string) {}
@@ -54,8 +54,9 @@ export class SonioxRecognizer implements SpeechRecognizer {
     await opened(socket);
     socket.send(this.configuration.handshake());
     void pump(audio, socket);
+    const reader = new SonioxTranscriptReader();
     for await (const raw of inbox) {
-      yield* parseSonioxMessage(raw);
+      yield* reader.read(raw);
     }
   }
 }

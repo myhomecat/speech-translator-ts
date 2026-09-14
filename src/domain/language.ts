@@ -18,6 +18,14 @@ export class Language {
     return found;
   }
 
+  // Soniox 인식 전용 모드는 토큰에 언어를 안 준다 → 글자로 판별.
+  // 한자만/기호뿐이면 확신 불가 → undefined(직전 언어 유지는 호출측 몫)
+  static detect(text: string): Language | undefined {
+    if (/[가-힣]/.test(text)) return Language.korean;
+    if (/[ぁ-ゟァ-ヿｦ-ﾟ]/.test(text)) return Language.japanese;
+    return undefined;
+  }
+
   counterpart(): Language {
     if (this === Language.korean) return Language.japanese;
     return Language.korean;
